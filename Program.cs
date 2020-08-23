@@ -18,6 +18,10 @@ namespace TicTacToe
             switch(winner)
             {
                 case PlayerID.None:
+                    UserInterface.SetBottomPanelData("It's a draw!\nPress any key to exit...");
+                    Console.Beep(600, 100);
+                    Console.Beep(400, 100);
+                    Console.Beep(200, 400);
                     break;
 
                 default:

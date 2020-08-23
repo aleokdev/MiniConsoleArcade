@@ -20,24 +20,27 @@ namespace TicTacToe
 
         Array2D<PlayerID> board;
         int cellsFilled;
-        (int, int) boardPos;
         (int, int) playerCursorPos;
+        (int, int) boardStartingPos => (
+            Console.WindowWidth / 2 - BoardLength / 2,
+            Console.WindowHeight / 2 - BoardLength / 2
+            );
+
         PlayerID currentPlayerPlaying = PlayerID.X;
 
-        public void Loop()
+        public PlayerID Play()
         {
-            Console.Title = "Tic Tac Toe!";
-            DrawHeader();
-
-            boardPos = (1, Console.CursorTop);
-
             board = new Array2D<PlayerID>((uint)BoardLength, (uint)BoardLength, PlayerID.None);
 
             while (true)
             {
-                DrawBoard();
-                (Console.CursorLeft, Console.CursorTop) = (boardPos.Item1 + playerCursorPos.Item1, boardPos.Item2 + playerCursorPos.Item2);
+                // Draw the board.
+                drawBoard();
 
+                // Set the cursor position.
+                (Console.CursorLeft, Console.CursorTop) = (boardStartingPos.Item1 + playerCursorPos.Item1, boardStartingPos.Item2 + playerCursorPos.Item2);
+
+                // Move the player cursor on key press.
                 var keyInfo = Console.ReadKey(intercept: true);
                 var (moveX, moveY) = keyInfo.Key switch
                 {
@@ -47,9 +50,10 @@ namespace TicTacToe
                     ConsoleKey.DownArrow => (0, 1),
                     _ => (0, 0)
                 };
-                TryMovePlayerCursorPos(moveX, moveY);
+                tryMovePlayerCursorPos(moveX, moveY);
 
-                if (keyInfo.Key == ConsoleKey.Enter)
+
+                if (keyInfo.Key == ConsoleKey.Z)
                 {
                     bool canPlace = board[playerCursorPos.Item1, playerCursorPos.Item2] == PlayerID.None;
                     if (canPlace)
@@ -76,13 +80,13 @@ namespace TicTacToe
                         var winner = checkWinner();
                         if (winner != PlayerID.None)
                         {
-                            OnWin?.Invoke(this, winner);
-                            return;
+                            drawBoard();
+                            return winner;
                         }
                         else if (cellsFilled == board.Width * board.Height)
                         {
-                            OnDraw?.Invoke(this, null);
-                            return;
+                            drawBoard();
+                            return PlayerID.None;
                         }
                     }
                     else
@@ -93,6 +97,10 @@ namespace TicTacToe
             }
         }
 
+        /// <summary>
+        /// Checks if there's an user who has won in the board.
+        /// </summary>
+        /// <returns>The player who has won, or PlayerID.None otherwise.</returns>
         PlayerID checkWinner()
         {
             // Check horizontally
@@ -109,8 +117,9 @@ namespace TicTacToe
                     {
                         chainLength++;
                         if (chainLength == BoardLength) return chainOwner;
-                    } else
-                        break;          
+                    }
+                    else
+                        break;
                 }
             }
 
@@ -174,32 +183,24 @@ namespace TicTacToe
                 }
             }
 
-
             return PlayerID.None;
         }
 
-        void DrawHeader()
-        {
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.Write("Welcome to ");
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.Write("Tic Tac Toe");
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("!\n");
-            Console.ResetColor();
-        }
-
-        void TryMovePlayerCursorPos(int x, int y)
-        {
+        /// <summary>
+        /// Tries to change the player's cursor position by X and Y amount and clamps to the board's borders.
+        /// </summary>
+        void tryMovePlayerCursorPos(int x, int y) =>
             playerCursorPos = (Math.Clamp(playerCursorPos.Item1 + x, 0, (int)board.Width - 1),
                 Math.Clamp(playerCursorPos.Item2 + y, 0, (int)board.Height - 1));
-        }
 
-        void DrawBoard()
+        /// <summary>
+        /// Draws the board.
+        /// </summary>
+        void drawBoard()
         {
             for (int y = 0; y < board.Height; y++)
             {
-                (Console.CursorLeft, Console.CursorTop) = (boardPos.Item1, (int)(boardPos.Item2 + y));
+                (Console.CursorLeft, Console.CursorTop) = (boardStartingPos.Item1, (int)(boardStartingPos.Item2 + y));
                 for (int x = 0; x < board.Width; x++)
                 {
                     var cellState = board[x, y];

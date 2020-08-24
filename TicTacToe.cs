@@ -17,9 +17,6 @@ namespace TicTacToe
         [GameSetting(Name = "Board Length", DefaultValue = 3)]
         public int BoardLength { get; set; }
 
-        public event EventHandler<PlayerID> OnWin;
-        public event EventHandler OnDraw;
-
         Array2D<PlayerID> board;
         int cellsFilled;
         (int, int) playerCursorPos;

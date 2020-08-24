@@ -12,6 +12,7 @@ namespace TicTacToe
 
         public static void SetTopPanelData(string text)
         {
+            Console.ResetColor();
             string[] lines = text.Split('\n');
 
             Console.CursorTop = 0;
@@ -30,6 +31,7 @@ namespace TicTacToe
 
         public static void SetBottomPanelData(string text)
         {
+            Console.ResetColor();
             string[] lines = text.Split('\n');
 
             Console.CursorTop = Console.WindowHeight - 1;
@@ -44,6 +46,12 @@ namespace TicTacToe
             Console.CursorLeft = 0;
             Console.Write(new string('=', Console.WindowWidth));
             TopPanelHeight = Console.WindowHeight - Console.CursorTop;
+        }
+
+        public static void Reset()
+        {
+            TopPanelHeight = 0;
+            BottomPanelHeight = 0;
         }
     }
 }

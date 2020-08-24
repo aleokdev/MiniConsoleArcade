@@ -11,9 +11,11 @@ namespace TicTacToe
         None
     }
 
-    public class Game
+    [Game(Name = "Tic Tac Toe")]
+    public sealed class TicTacToe : IGame
     {
-        public int BoardLength { get; set; } = 3;
+        [GameSetting(Name = "Board Length", DefaultValue = 3)]
+        public int BoardLength { get; set; }
 
         public event EventHandler<PlayerID> OnWin;
         public event EventHandler OnDraw;
@@ -28,8 +30,10 @@ namespace TicTacToe
 
         PlayerID currentPlayerPlaying = PlayerID.X;
 
-        public PlayerID Play()
+        public void Play()
         {
+            Console.Title = "Tic Tac Toe!";
+            UserInterface.SetTopPanelData("Welcome to Tic Tac Toe!\nMove using arrow keys &\n place pieces by pressing Z.");
             board = new Array2D<PlayerID>((uint)BoardLength, (uint)BoardLength, PlayerID.None);
 
             while (true)
@@ -78,15 +82,29 @@ namespace TicTacToe
                         };
 
                         var winner = checkWinner();
-                        if (winner != PlayerID.None)
+                        if(winner != PlayerID.None)
                         {
                             drawBoard();
-                            return winner;
-                        }
-                        else if (cellsFilled == board.Width * board.Height)
+                            UserInterface.SetBottomPanelData(winner switch
+                            {
+                                PlayerID.X => "X",
+                                PlayerID.O => "O",
+                                _ => throw new InvalidOperationException()
+                            } + " won!\nPress any key to exit...");
+                            Console.Beep(400, 100);
+                            Console.Beep(450, 100);
+                            Console.Beep(600, 100);
+                            Console.ReadKey(intercept: true);
+                            return;
+                        } else if (cellsFilled == board.Width * board.Height)
                         {
                             drawBoard();
-                            return PlayerID.None;
+                            UserInterface.SetBottomPanelData("It's a draw!\nPress any key to exit...");
+                            Console.Beep(600, 100);
+                            Console.Beep(400, 100);
+                            Console.Beep(200, 400);
+                            Console.ReadKey(intercept: true);
+                            return;
                         }
                     }
                     else

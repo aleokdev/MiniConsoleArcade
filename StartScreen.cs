@@ -100,11 +100,14 @@ namespace TicTacToe
                     case ConsoleKey.A:
                     case ConsoleKey.LeftArrow:
                         Value = (int)Value - 1;
+                        // TODO: Replace with range attribute
+                        if ((int)Value < 1) Value = 1;
                         break;
 
                     case ConsoleKey.D:
                     case ConsoleKey.RightArrow:
                         Value = (int)Value + 1;
+                        if ((int)Value > 10) Value = 10;
                         break;
                 }
             }
